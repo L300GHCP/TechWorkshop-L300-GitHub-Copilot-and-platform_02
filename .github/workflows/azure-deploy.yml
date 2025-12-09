@@ -1,0 +1,82 @@
+name: Deploy to Azure
+
+on:
+  push:
+    branches: [ main, dev ]
+  workflow_dispatch:
+
+env:
+  AZURE_RESOURCE_GROUP: rg-zavastore-dev-westus3
+  AZURE_LOCATION: westus3
+
+jobs:
+  provision:
+    runs-on: ubuntu-latest
+    outputs:
+      acr-name: ${{ steps.infra.outputs.acrName }}
+      acr-login-server: ${{ steps.infra.outputs.acrLoginServer }}
+      app-service-name: ${{ steps.infra.outputs.appServiceName }}
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      
+      - name: Deploy Infrastructure
+        id: infra
+        uses: azure/arm-deploy@v2
+        with:
+          scope: subscription
+          region: ${{ env.AZURE_LOCATION }}
+          template: ./infra/main.bicep
+          parameters: ./infra/main.bicepparam
+          deploymentName: zavastore-${{ github.run_number }}
+      
+      - name: Save outputs
+        run: |
+          echo "ACR_NAME=${{ steps.infra.outputs.acrName }}" >> $GITHUB_ENV
+          echo "ACR_LOGIN_SERVER=${{ steps.infra.outputs.acrLoginServer }}" >> $GITHUB_ENV
+          echo "APP_SERVICE_NAME=${{ steps.infra.outputs.appServiceName }}" >> $GITHUB_ENV
+
+  build-and-deploy:
+    needs: provision
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      
+      - name: Build and Push to ACR
+        run: |
+          az acr build \
+            --registry ${{ needs.provision.outputs.acr-name }} \
+            --image zavastore:${{ github.sha }} \
+            --image zavastore:latest \
+            --file src/Dockerfile \
+            ./src
+      
+      - name: Deploy to App Service
+        run: |
+          az webapp config container set \
+            --name ${{ needs.provision.outputs.app-service-name }} \
+            --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+            --docker-custom-image-name ${{ needs.provision.outputs.acr-login-server }}/zavastore:${{ github.sha }}
+      
+      - name: Restart App Service
+        run: |
+          az webapp restart \
+            --name ${{ needs.provision.outputs.app-service-name }} \
+            --resource-group ${{ env.AZURE_RESOURCE_GROUP }}
+      
+      - name: Health Check
+        run: |
+          echo "Waiting for app to start..."
+          sleep 30
+          curl -f https://${{ needs.provision.outputs.app-service-name }}.azurewebsites.net || exit 1
