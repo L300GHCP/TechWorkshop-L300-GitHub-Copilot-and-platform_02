@@ -148,3 +148,35 @@ desktop.ini
 # Keep track of local configs that may be useful to commit by exception
 !/.gitattributes
 !/.gitignore
+
+# Azure Developer CLI
+.azure/
+**/azd-debug.log
+
+# Azure Functions
+local.settings.json
+__blobstorage__
+__queuestorage__
+__azurite_db*__.json
+
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+
+# Pulumi
+Pulumi.*.yaml
+.pulumi/
+
+# ARM Templates / Bicep generated files
+*.json
+!package.json
+!package-lock.json
+!tsconfig.json
+!.vscode/*.json
+!infra/**/*.json
+
+# Keep important files
+!src/Dockerfile
+!src/.dockerignore
