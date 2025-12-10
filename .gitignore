@@ -97,6 +97,10 @@ docker-compose.override.yml
 .azure/
 !.azure/.gitkeep
 
+# Bicep compiled files (ARM templates)
+infra/**/*.json
+!infra/**/*.parameters*.json
+
 # Logs
 *.log
 logs/
