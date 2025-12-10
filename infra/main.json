@@ -1,0 +1,1112 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.39.26.7824",
+      "templateHash": "10772083180493233210"
+    }
+  },
+  "parameters": {
+    "environmentName": {
+      "type": "string",
+      "defaultValue": "dev",
+      "minLength": 1,
+      "maxLength": 10,
+      "metadata": {
+        "description": "The environment name (e.g., dev, staging, prod)"
+      }
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "westus3",
+      "metadata": {
+        "description": "The primary location for all resources"
+      }
+    },
+    "appName": {
+      "type": "string",
+      "defaultValue": "zavastore",
+      "metadata": {
+        "description": "The name of the application"
+      }
+    },
+    "containerImageTag": {
+      "type": "string",
+      "defaultValue": "latest",
+      "metadata": {
+        "description": "The container image tag to deploy"
+      }
+    },
+    "tags": {
+      "type": "object",
+      "defaultValue": {
+        "environment": "[parameters('environmentName')]",
+        "application": "[parameters('appName')]",
+        "managed-by": "bicep"
+      },
+      "metadata": {
+        "description": "Tags to apply to all resources"
+      }
+    }
+  },
+  "variables": {
+    "resourceGroupName": "[format('rg-{0}-{1}-{2}', parameters('appName'), parameters('environmentName'), parameters('location'))]",
+    "acrName": "[replace(format('acr{0}{1}{2}', parameters('appName'), parameters('environmentName'), parameters('location')), '-', '')]",
+    "appServicePlanName": "[format('asp-{0}-{1}-{2}', parameters('appName'), parameters('environmentName'), parameters('location'))]",
+    "appServiceName": "[format('app-{0}-{1}-{2}', parameters('appName'), parameters('environmentName'), parameters('location'))]",
+    "logAnalyticsName": "[format('log-{0}-{1}-{2}', parameters('appName'), parameters('environmentName'), parameters('location'))]",
+    "appInsightsName": "[format('appi-{0}-{1}-{2}', parameters('appName'), parameters('environmentName'), parameters('location'))]",
+    "aiFoundryName": "[format('aif-{0}-{1}-{2}', parameters('appName'), parameters('environmentName'), parameters('location'))]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Resources/resourceGroups",
+      "apiVersion": "2023-07-01",
+      "name": "[variables('resourceGroupName')]",
+      "location": "[parameters('location')]",
+      "tags": "[parameters('tags')]"
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-04-01",
+      "name": "resources-deployment",
+      "resourceGroup": "[variables('resourceGroupName')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "acrName": {
+            "value": "[variables('acrName')]"
+          },
+          "appServicePlanName": {
+            "value": "[variables('appServicePlanName')]"
+          },
+          "appServiceName": {
+            "value": "[variables('appServiceName')]"
+          },
+          "logAnalyticsName": {
+            "value": "[variables('logAnalyticsName')]"
+          },
+          "appInsightsName": {
+            "value": "[variables('appInsightsName')]"
+          },
+          "aiFoundryName": {
+            "value": "[variables('aiFoundryName')]"
+          },
+          "containerImageTag": {
+            "value": "[parameters('containerImageTag')]"
+          },
+          "tags": {
+            "value": "[parameters('tags')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.39.26.7824",
+              "templateHash": "17671190399726001151"
+            }
+          },
+          "parameters": {
+            "location": {
+              "type": "string",
+              "metadata": {
+                "description": "The location for all resources"
+              }
+            },
+            "acrName": {
+              "type": "string",
+              "metadata": {
+                "description": "The name of the Azure Container Registry"
+              }
+            },
+            "appServicePlanName": {
+              "type": "string",
+              "metadata": {
+                "description": "The name of the App Service Plan"
+              }
+            },
+            "appServiceName": {
+              "type": "string",
+              "metadata": {
+                "description": "The name of the App Service"
+              }
+            },
+            "logAnalyticsName": {
+              "type": "string",
+              "metadata": {
+                "description": "The name of the Log Analytics Workspace"
+              }
+            },
+            "appInsightsName": {
+              "type": "string",
+              "metadata": {
+                "description": "The name of the Application Insights"
+              }
+            },
+            "aiFoundryName": {
+              "type": "string",
+              "metadata": {
+                "description": "The name of the AI Foundry Hub"
+              }
+            },
+            "containerImageTag": {
+              "type": "string",
+              "metadata": {
+                "description": "The container image tag to deploy"
+              }
+            },
+            "tags": {
+              "type": "object",
+              "metadata": {
+                "description": "Tags to apply to all resources"
+              }
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Resources/deployments",
+              "apiVersion": "2025-04-01",
+              "name": "log-analytics-deployment",
+              "properties": {
+                "expressionEvaluationOptions": {
+                  "scope": "inner"
+                },
+                "mode": "Incremental",
+                "parameters": {
+                  "name": {
+                    "value": "[parameters('logAnalyticsName')]"
+                  },
+                  "location": {
+                    "value": "[parameters('location')]"
+                  },
+                  "tags": {
+                    "value": "[parameters('tags')]"
+                  }
+                },
+                "template": {
+                  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                  "contentVersion": "1.0.0.0",
+                  "metadata": {
+                    "_generator": {
+                      "name": "bicep",
+                      "version": "0.39.26.7824",
+                      "templateHash": "10021037409310753655"
+                    }
+                  },
+                  "parameters": {
+                    "name": {
+                      "type": "string",
+                      "metadata": {
+                        "description": "The name of the Log Analytics Workspace"
+                      }
+                    },
+                    "location": {
+                      "type": "string",
+                      "defaultValue": "[resourceGroup().location]",
+                      "metadata": {
+                        "description": "The location for the Log Analytics Workspace"
+                      }
+                    },
+                    "sku": {
+                      "type": "string",
+                      "defaultValue": "PerGB2018",
+                      "allowedValues": [
+                        "PerGB2018",
+                        "Free",
+                        "Standalone",
+                        "PerNode",
+                        "Standard",
+                        "Premium"
+                      ],
+                      "metadata": {
+                        "description": "The SKU of the Log Analytics Workspace"
+                      }
+                    },
+                    "retentionInDays": {
+                      "type": "int",
+                      "defaultValue": 30,
+                      "metadata": {
+                        "description": "The retention period in days"
+                      }
+                    },
+                    "tags": {
+                      "type": "object",
+                      "defaultValue": {},
+                      "metadata": {
+                        "description": "Tags to apply to the resource"
+                      }
+                    }
+                  },
+                  "resources": [
+                    {
+                      "type": "Microsoft.OperationalInsights/workspaces",
+                      "apiVersion": "2022-10-01",
+                      "name": "[parameters('name')]",
+                      "location": "[parameters('location')]",
+                      "tags": "[parameters('tags')]",
+                      "properties": {
+                        "sku": {
+                          "name": "[parameters('sku')]"
+                        },
+                        "retentionInDays": "[parameters('retentionInDays')]",
+                        "publicNetworkAccessForIngestion": "Enabled",
+                        "publicNetworkAccessForQuery": "Enabled"
+                      }
+                    }
+                  ],
+                  "outputs": {
+                    "id": {
+                      "type": "string",
+                      "metadata": {
+                        "description": "The resource ID of the Log Analytics Workspace"
+                      },
+                      "value": "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('name'))]"
+                    },
+                    "customerId": {
+                      "type": "string",
+                      "metadata": {
+                        "description": "The customer ID of the Log Analytics Workspace"
+                      },
+                      "value": "[reference(resourceId('Microsoft.OperationalInsights/workspaces', parameters('name')), '2022-10-01').customerId]"
+                    },
+                    "name": {
+                      "type": "string",
+                      "metadata": {
+                        "description": "The name of the Log Analytics Workspace"
+                      },
+                      "value": "[parameters('name')]"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "type": "Microsoft.Resources/deployments",
+              "apiVersion": "2025-04-01",
+              "name": "app-insights-deployment",
+              "properties": {
+                "expressionEvaluationOptions": {
+                  "scope": "inner"
+                },
+                "mode": "Incremental",
+                "parameters": {
+                  "name": {
+                    "value": "[parameters('appInsightsName')]"
+                  },
+                  "location": {
+                    "value": "[parameters('location')]"
+                  },
+                  "workspaceId": {
+                    "value": "[reference(resourceId('Microsoft.Resources/deployments', 'log-analytics-deployment'), '2025-04-01').outputs.id.value]"
+                  },
+                  "tags": {
+                    "value": "[parameters('tags')]"
+                  }
+                },
+                "template": {
+                  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                  "contentVersion": "1.0.0.0",
+                  "metadata": {
+                    "_generator": {
+                      "name": "bicep",
+                      "version": "0.39.26.7824",
+                      "templateHash": "4011901440755923873"
+                    }
+                  },
+                  "parameters": {
+                    "name": {
+                      "type": "string",
+                      "metadata": {
+                        "description": "The name of the Application Insights"
+                      }
+                    },
+                    "location": {
+                      "type": "string",
+                      "defaultValue": "[resourceGroup().location]",
+                      "metadata": {
+                        "description": "The location for the Application Insights"
+                      }
+                    },
+                    "workspaceId": {
+                      "type": "string",
+                      "metadata": {
+                        "description": "The resource ID of the Log Analytics Workspace"
+                      }
+                    },
+                    "tags": {
+                      "type": "object",
+                      "defaultValue": {},
+                      "metadata": {
+                        "description": "Tags to apply to the resource"
+                      }
+                    }
+                  },
+                  "resources": [
+                    {
+                      "type": "Microsoft.Insights/components",
+                      "apiVersion": "2020-02-02",
+                      "name": "[parameters('name')]",
+                      "location": "[parameters('location')]",
+                      "tags": "[parameters('tags')]",
+                      "kind": "web",
+                      "properties": {
+                        "Application_Type": "web",
+                        "WorkspaceResourceId": "[parameters('workspaceId')]",
+                        "publicNetworkAccessForIngestion": "Enabled",
+                        "publicNetworkAccessForQuery": "Enabled"
+                      }
+                    }
+                  ],
+                  "outputs": {
+                    "id": {
+                      "type": "string",
+                      "metadata": {
+                        "description": "The resource ID of the Application Insights"
+                      },
+                      "value": "[resourceId('Microsoft.Insights/components', parameters('name'))]"
+                    },
+                    "instrumentationKey": {
+                      "type": "string",
+                      "metadata": {
+                        "description": "The instrumentation key of the Application Insights"
+                      },
+                      "value": "[reference(resourceId('Microsoft.Insights/components', parameters('name')), '2020-02-02').InstrumentationKey]"
+                    },
+                    "connectionString": {
+                      "type": "string",
+                      "metadata": {
+                        "description": "The connection string of the Application Insights"
+                      },
+                      "value": "[reference(resourceId('Microsoft.Insights/components', parameters('name')), '2020-02-02').ConnectionString]"
+                    },
+                    "name": {
+                      "type": "string",
+                      "metadata": {
+                        "description": "The name of the Application Insights"
+                      },
+                      "value": "[parameters('name')]"
+                    }
+                  }
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', 'log-analytics-deployment')]"
+              ]
+            },
+            {
+              "type": "Microsoft.Resources/deployments",
+              "apiVersion": "2025-04-01",
+              "name": "acr-deployment",
+              "properties": {
+                "expressionEvaluationOptions": {
+                  "scope": "inner"
+                },
+                "mode": "Incremental",
+                "parameters": {
+                  "name": {
+                    "value": "[parameters('acrName')]"
+                  },
+                  "location": {
+                    "value": "[parameters('location')]"
+                  },
+                  "sku": {
+                    "value": "Basic"
+                  },
+                  "tags": {
+                    "value": "[parameters('tags')]"
+                  }
+                },
+                "template": {
+                  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                  "contentVersion": "1.0.0.0",
+                  "metadata": {
+                    "_generator": {
+                      "name": "bicep",
+                      "version": "0.39.26.7824",
+                      "templateHash": "6656230612355671510"
+                    }
+                  },
+                  "parameters": {
+                    "name": {
+                      "type": "string",
+                      "metadata": {
+                        "description": "The name of the Azure Container Registry"
+                      }
+                    },
+                    "location": {
+                      "type": "string",
+                      "defaultValue": "[resourceGroup().location]",
+                      "metadata": {
+                        "description": "The location for the Azure Container Registry"
+                      }
+                    },
+                    "sku": {
+                      "type": "string",
+                      "defaultValue": "Basic",
+                      "allowedValues": [
+                        "Basic",
+                        "Standard",
+                        "Premium"
+                      ],
+                      "metadata": {
+                        "description": "The SKU of the Azure Container Registry"
+                      }
+                    },
+                    "tags": {
+                      "type": "object",
+                      "defaultValue": {},
+                      "metadata": {
+                        "description": "Tags to apply to the resource"
+                      }
+                    }
+                  },
+                  "resources": [
+                    {
+                      "type": "Microsoft.ContainerRegistry/registries",
+                      "apiVersion": "2023-07-01",
+                      "name": "[parameters('name')]",
+                      "location": "[parameters('location')]",
+                      "tags": "[parameters('tags')]",
+                      "sku": {
+                        "name": "[parameters('sku')]"
+                      },
+                      "properties": {
+                        "adminUserEnabled": false,
+                        "publicNetworkAccess": "Enabled",
+                        "networkRuleBypassOptions": "AzureServices",
+                        "policies": {
+                          "retentionPolicy": {
+                            "days": 7,
+                            "status": "enabled"
+                          }
+                        }
+                      }
+                    }
+                  ],
+                  "outputs": {
+                    "loginServer": {
+                      "type": "string",
+                      "metadata": {
+                        "description": "The login server for the ACR"
+                      },
+                      "value": "[reference(resourceId('Microsoft.ContainerRegistry/registries', parameters('name')), '2023-07-01').loginServer]"
+                    },
+                    "id": {
+                      "type": "string",
+                      "metadata": {
+                        "description": "The resource ID of the ACR"
+                      },
+                      "value": "[resourceId('Microsoft.ContainerRegistry/registries', parameters('name'))]"
+                    },
+                    "name": {
+                      "type": "string",
+                      "metadata": {
+                        "description": "The name of the ACR"
+                      },
+                      "value": "[parameters('name')]"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "type": "Microsoft.Resources/deployments",
+              "apiVersion": "2025-04-01",
+              "name": "app-service-plan-deployment",
+              "properties": {
+                "expressionEvaluationOptions": {
+                  "scope": "inner"
+                },
+                "mode": "Incremental",
+                "parameters": {
+                  "name": {
+                    "value": "[parameters('appServicePlanName')]"
+                  },
+                  "location": {
+                    "value": "[parameters('location')]"
+                  },
+                  "sku": {
+                    "value": "B1"
+                  },
+                  "tags": {
+                    "value": "[parameters('tags')]"
+                  }
+                },
+                "template": {
+                  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                  "contentVersion": "1.0.0.0",
+                  "metadata": {
+                    "_generator": {
+                      "name": "bicep",
+                      "version": "0.39.26.7824",
+                      "templateHash": "3834360897435279572"
+                    }
+                  },
+                  "parameters": {
+                    "name": {
+                      "type": "string",
+                      "metadata": {
+                        "description": "The name of the App Service Plan"
+                      }
+                    },
+                    "location": {
+                      "type": "string",
+                      "defaultValue": "[resourceGroup().location]",
+                      "metadata": {
+                        "description": "The location for the App Service Plan"
+                      }
+                    },
+                    "sku": {
+                      "type": "string",
+                      "defaultValue": "B1",
+                      "allowedValues": [
+                        "B1",
+                        "B2",
+                        "B3",
+                        "S1",
+                        "S2",
+                        "S3",
+                        "P1v2",
+                        "P2v2",
+                        "P3v2"
+                      ],
+                      "metadata": {
+                        "description": "The SKU of the App Service Plan"
+                      }
+                    },
+                    "tags": {
+                      "type": "object",
+                      "defaultValue": {},
+                      "metadata": {
+                        "description": "Tags to apply to the resource"
+                      }
+                    }
+                  },
+                  "resources": [
+                    {
+                      "type": "Microsoft.Web/serverfarms",
+                      "apiVersion": "2023-01-01",
+                      "name": "[parameters('name')]",
+                      "location": "[parameters('location')]",
+                      "tags": "[parameters('tags')]",
+                      "sku": {
+                        "name": "[parameters('sku')]"
+                      },
+                      "kind": "linux",
+                      "properties": {
+                        "reserved": true
+                      }
+                    }
+                  ],
+                  "outputs": {
+                    "id": {
+                      "type": "string",
+                      "metadata": {
+                        "description": "The resource ID of the App Service Plan"
+                      },
+                      "value": "[resourceId('Microsoft.Web/serverfarms', parameters('name'))]"
+                    },
+                    "name": {
+                      "type": "string",
+                      "metadata": {
+                        "description": "The name of the App Service Plan"
+                      },
+                      "value": "[parameters('name')]"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "type": "Microsoft.Resources/deployments",
+              "apiVersion": "2025-04-01",
+              "name": "app-service-deployment",
+              "properties": {
+                "expressionEvaluationOptions": {
+                  "scope": "inner"
+                },
+                "mode": "Incremental",
+                "parameters": {
+                  "name": {
+                    "value": "[parameters('appServiceName')]"
+                  },
+                  "location": {
+                    "value": "[parameters('location')]"
+                  },
+                  "appServicePlanId": {
+                    "value": "[reference(resourceId('Microsoft.Resources/deployments', 'app-service-plan-deployment'), '2025-04-01').outputs.id.value]"
+                  },
+                  "acrLoginServer": {
+                    "value": "[reference(resourceId('Microsoft.Resources/deployments', 'acr-deployment'), '2025-04-01').outputs.loginServer.value]"
+                  },
+                  "containerImageName": {
+                    "value": "zava-storefront"
+                  },
+                  "containerImageTag": {
+                    "value": "[parameters('containerImageTag')]"
+                  },
+                  "appInsightsConnectionString": {
+                    "value": "[reference(resourceId('Microsoft.Resources/deployments', 'app-insights-deployment'), '2025-04-01').outputs.connectionString.value]"
+                  },
+                  "tags": {
+                    "value": "[parameters('tags')]"
+                  }
+                },
+                "template": {
+                  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                  "contentVersion": "1.0.0.0",
+                  "metadata": {
+                    "_generator": {
+                      "name": "bicep",
+                      "version": "0.39.26.7824",
+                      "templateHash": "9946562575618324870"
+                    }
+                  },
+                  "parameters": {
+                    "name": {
+                      "type": "string",
+                      "metadata": {
+                        "description": "The name of the App Service"
+                      }
+                    },
+                    "location": {
+                      "type": "string",
+                      "defaultValue": "[resourceGroup().location]",
+                      "metadata": {
+                        "description": "The location for the App Service"
+                      }
+                    },
+                    "appServicePlanId": {
+                      "type": "string",
+                      "metadata": {
+                        "description": "The resource ID of the App Service Plan"
+                      }
+                    },
+                    "acrLoginServer": {
+                      "type": "string",
+                      "metadata": {
+                        "description": "The login server of the Azure Container Registry"
+                      }
+                    },
+                    "containerImageName": {
+                      "type": "string",
+                      "defaultValue": "zava-storefront",
+                      "metadata": {
+                        "description": "The name of the container image"
+                      }
+                    },
+                    "containerImageTag": {
+                      "type": "string",
+                      "defaultValue": "latest",
+                      "metadata": {
+                        "description": "The tag of the container image"
+                      }
+                    },
+                    "appInsightsConnectionString": {
+                      "type": "string",
+                      "defaultValue": "",
+                      "metadata": {
+                        "description": "The Application Insights connection string"
+                      }
+                    },
+                    "tags": {
+                      "type": "object",
+                      "defaultValue": {},
+                      "metadata": {
+                        "description": "Tags to apply to the resource"
+                      }
+                    }
+                  },
+                  "resources": [
+                    {
+                      "type": "Microsoft.Web/sites",
+                      "apiVersion": "2023-01-01",
+                      "name": "[parameters('name')]",
+                      "location": "[parameters('location')]",
+                      "tags": "[parameters('tags')]",
+                      "kind": "app,linux,container",
+                      "identity": {
+                        "type": "SystemAssigned"
+                      },
+                      "properties": {
+                        "serverFarmId": "[parameters('appServicePlanId')]",
+                        "httpsOnly": true,
+                        "siteConfig": {
+                          "linuxFxVersion": "[format('DOCKER|{0}/{1}:{2}', parameters('acrLoginServer'), parameters('containerImageName'), parameters('containerImageTag'))]",
+                          "acrUseManagedIdentityCreds": true,
+                          "alwaysOn": true,
+                          "minTlsVersion": "1.2",
+                          "ftpsState": "Disabled",
+                          "appSettings": [
+                            {
+                              "name": "WEBSITES_ENABLE_APP_SERVICE_STORAGE",
+                              "value": "false"
+                            },
+                            {
+                              "name": "DOCKER_REGISTRY_SERVER_URL",
+                              "value": "[format('https://{0}', parameters('acrLoginServer'))]"
+                            },
+                            {
+                              "name": "WEBSITES_PORT",
+                              "value": "8080"
+                            },
+                            {
+                              "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
+                              "value": "[parameters('appInsightsConnectionString')]"
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ],
+                  "outputs": {
+                    "principalId": {
+                      "type": "string",
+                      "metadata": {
+                        "description": "The principal ID of the system-assigned managed identity"
+                      },
+                      "value": "[reference(resourceId('Microsoft.Web/sites', parameters('name')), '2023-01-01', 'full').identity.principalId]"
+                    },
+                    "id": {
+                      "type": "string",
+                      "metadata": {
+                        "description": "The resource ID of the App Service"
+                      },
+                      "value": "[resourceId('Microsoft.Web/sites', parameters('name'))]"
+                    },
+                    "name": {
+                      "type": "string",
+                      "metadata": {
+                        "description": "The name of the App Service"
+                      },
+                      "value": "[parameters('name')]"
+                    },
+                    "defaultHostname": {
+                      "type": "string",
+                      "metadata": {
+                        "description": "The default hostname of the App Service"
+                      },
+                      "value": "[reference(resourceId('Microsoft.Web/sites', parameters('name')), '2023-01-01').defaultHostName]"
+                    }
+                  }
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', 'acr-deployment')]",
+                "[resourceId('Microsoft.Resources/deployments', 'app-insights-deployment')]",
+                "[resourceId('Microsoft.Resources/deployments', 'app-service-plan-deployment')]"
+              ]
+            },
+            {
+              "type": "Microsoft.Resources/deployments",
+              "apiVersion": "2025-04-01",
+              "name": "acr-role-assignment-deployment",
+              "properties": {
+                "expressionEvaluationOptions": {
+                  "scope": "inner"
+                },
+                "mode": "Incremental",
+                "parameters": {
+                  "principalId": {
+                    "value": "[reference(resourceId('Microsoft.Resources/deployments', 'app-service-deployment'), '2025-04-01').outputs.principalId.value]"
+                  },
+                  "acrId": {
+                    "value": "[reference(resourceId('Microsoft.Resources/deployments', 'acr-deployment'), '2025-04-01').outputs.id.value]"
+                  }
+                },
+                "template": {
+                  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                  "contentVersion": "1.0.0.0",
+                  "metadata": {
+                    "_generator": {
+                      "name": "bicep",
+                      "version": "0.39.26.7824",
+                      "templateHash": "5011034228346732121"
+                    }
+                  },
+                  "parameters": {
+                    "principalId": {
+                      "type": "string",
+                      "metadata": {
+                        "description": "The principal ID to assign the role to"
+                      }
+                    },
+                    "acrId": {
+                      "type": "string",
+                      "metadata": {
+                        "description": "The resource ID of the Azure Container Registry"
+                      }
+                    },
+                    "principalType": {
+                      "type": "string",
+                      "defaultValue": "ServicePrincipal",
+                      "allowedValues": [
+                        "ServicePrincipal",
+                        "User",
+                        "Group"
+                      ],
+                      "metadata": {
+                        "description": "The principal type (ServicePrincipal, User, or Group)"
+                      }
+                    }
+                  },
+                  "variables": {
+                    "acrPullRoleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '7f951dda-4ed3-4680-a7ca-43fe172d538d')]"
+                  },
+                  "resources": [
+                    {
+                      "type": "Microsoft.Authorization/roleAssignments",
+                      "apiVersion": "2022-04-01",
+                      "name": "[guid(parameters('acrId'), parameters('principalId'), variables('acrPullRoleDefinitionId'))]",
+                      "properties": {
+                        "roleDefinitionId": "[variables('acrPullRoleDefinitionId')]",
+                        "principalId": "[parameters('principalId')]",
+                        "principalType": "[parameters('principalType')]"
+                      }
+                    }
+                  ],
+                  "outputs": {
+                    "id": {
+                      "type": "string",
+                      "metadata": {
+                        "description": "The ID of the role assignment"
+                      },
+                      "value": "[resourceId('Microsoft.Authorization/roleAssignments', guid(parameters('acrId'), parameters('principalId'), variables('acrPullRoleDefinitionId')))]"
+                    }
+                  }
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', 'acr-deployment')]",
+                "[resourceId('Microsoft.Resources/deployments', 'app-service-deployment')]"
+              ]
+            },
+            {
+              "type": "Microsoft.Resources/deployments",
+              "apiVersion": "2025-04-01",
+              "name": "ai-foundry-deployment",
+              "properties": {
+                "expressionEvaluationOptions": {
+                  "scope": "inner"
+                },
+                "mode": "Incremental",
+                "parameters": {
+                  "name": {
+                    "value": "[parameters('aiFoundryName')]"
+                  },
+                  "location": {
+                    "value": "[parameters('location')]"
+                  },
+                  "tags": {
+                    "value": "[parameters('tags')]"
+                  }
+                },
+                "template": {
+                  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                  "contentVersion": "1.0.0.0",
+                  "metadata": {
+                    "_generator": {
+                      "name": "bicep",
+                      "version": "0.39.26.7824",
+                      "templateHash": "15491235113778765958"
+                    }
+                  },
+                  "parameters": {
+                    "name": {
+                      "type": "string",
+                      "metadata": {
+                        "description": "The name of the AI Foundry Hub"
+                      }
+                    },
+                    "location": {
+                      "type": "string",
+                      "defaultValue": "[resourceGroup().location]",
+                      "metadata": {
+                        "description": "The location for the AI Foundry Hub"
+                      }
+                    },
+                    "friendlyName": {
+                      "type": "string",
+                      "defaultValue": "",
+                      "metadata": {
+                        "description": "The friendly name for the AI Foundry Hub"
+                      }
+                    },
+                    "hubDescription": {
+                      "type": "string",
+                      "defaultValue": "AI Foundry Hub for ZavaStorefront application",
+                      "metadata": {
+                        "description": "The description of the AI Foundry Hub"
+                      }
+                    },
+                    "tags": {
+                      "type": "object",
+                      "defaultValue": {},
+                      "metadata": {
+                        "description": "Tags to apply to the resource"
+                      }
+                    }
+                  },
+                  "resources": [
+                    {
+                      "type": "Microsoft.MachineLearningServices/workspaces",
+                      "apiVersion": "2024-04-01",
+                      "name": "[parameters('name')]",
+                      "location": "[parameters('location')]",
+                      "tags": "[parameters('tags')]",
+                      "kind": "Hub",
+                      "identity": {
+                        "type": "SystemAssigned"
+                      },
+                      "properties": {
+                        "friendlyName": "[if(empty(parameters('friendlyName')), parameters('name'), parameters('friendlyName'))]",
+                        "description": "[parameters('hubDescription')]",
+                        "publicNetworkAccess": "Enabled"
+                      },
+                      "sku": {
+                        "name": "Basic",
+                        "tier": "Basic"
+                      }
+                    }
+                  ],
+                  "outputs": {
+                    "id": {
+                      "type": "string",
+                      "metadata": {
+                        "description": "The resource ID of the AI Foundry Hub"
+                      },
+                      "value": "[resourceId('Microsoft.MachineLearningServices/workspaces', parameters('name'))]"
+                    },
+                    "name": {
+                      "type": "string",
+                      "metadata": {
+                        "description": "The name of the AI Foundry Hub"
+                      },
+                      "value": "[parameters('name')]"
+                    },
+                    "principalId": {
+                      "type": "string",
+                      "metadata": {
+                        "description": "The principal ID of the system-assigned managed identity"
+                      },
+                      "value": "[reference(resourceId('Microsoft.MachineLearningServices/workspaces', parameters('name')), '2024-04-01', 'full').identity.principalId]"
+                    }
+                  }
+                }
+              }
+            }
+          ],
+          "outputs": {
+            "acrName": {
+              "type": "string",
+              "metadata": {
+                "description": "The name of the ACR"
+              },
+              "value": "[reference(resourceId('Microsoft.Resources/deployments', 'acr-deployment'), '2025-04-01').outputs.name.value]"
+            },
+            "acrLoginServer": {
+              "type": "string",
+              "metadata": {
+                "description": "The login server of the ACR"
+              },
+              "value": "[reference(resourceId('Microsoft.Resources/deployments', 'acr-deployment'), '2025-04-01').outputs.loginServer.value]"
+            },
+            "appServiceName": {
+              "type": "string",
+              "metadata": {
+                "description": "The name of the App Service"
+              },
+              "value": "[reference(resourceId('Microsoft.Resources/deployments', 'app-service-deployment'), '2025-04-01').outputs.name.value]"
+            },
+            "appServiceHostname": {
+              "type": "string",
+              "metadata": {
+                "description": "The default hostname of the App Service"
+              },
+              "value": "[reference(resourceId('Microsoft.Resources/deployments', 'app-service-deployment'), '2025-04-01').outputs.defaultHostname.value]"
+            },
+            "appInsightsName": {
+              "type": "string",
+              "metadata": {
+                "description": "The name of the Application Insights"
+              },
+              "value": "[reference(resourceId('Microsoft.Resources/deployments', 'app-insights-deployment'), '2025-04-01').outputs.name.value]"
+            },
+            "aiFoundryName": {
+              "type": "string",
+              "metadata": {
+                "description": "The name of the AI Foundry Hub"
+              },
+              "value": "[reference(resourceId('Microsoft.Resources/deployments', 'ai-foundry-deployment'), '2025-04-01').outputs.name.value]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', variables('resourceGroupName'))]"
+      ]
+    }
+  ],
+  "outputs": {
+    "resourceGroupName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the resource group"
+      },
+      "value": "[variables('resourceGroupName')]"
+    },
+    "acrName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the ACR"
+      },
+      "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', 'resources-deployment'), '2025-04-01').outputs.acrName.value]"
+    },
+    "acrLoginServer": {
+      "type": "string",
+      "metadata": {
+        "description": "The login server of the ACR"
+      },
+      "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', 'resources-deployment'), '2025-04-01').outputs.acrLoginServer.value]"
+    },
+    "appServiceName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the App Service"
+      },
+      "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', 'resources-deployment'), '2025-04-01').outputs.appServiceName.value]"
+    },
+    "appServiceHostname": {
+      "type": "string",
+      "metadata": {
+        "description": "The default hostname of the App Service"
+      },
+      "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', 'resources-deployment'), '2025-04-01').outputs.appServiceHostname.value]"
+    },
+    "appInsightsName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the Application Insights"
+      },
+      "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', 'resources-deployment'), '2025-04-01').outputs.appInsightsName.value]"
+    },
+    "aiFoundryName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the AI Foundry Hub"
+      },
+      "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', 'resources-deployment'), '2025-04-01').outputs.aiFoundryName.value]"
+    }
+  }
+}
