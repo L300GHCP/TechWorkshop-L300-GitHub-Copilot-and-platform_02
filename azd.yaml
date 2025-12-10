@@ -1,0 +1,40 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/Azure/azure-dev/main/schemas/v1.0/azure.yaml.json
+
+name: zavastore
+metadata:
+  template: zavastore-webapp
+
+services:
+  web:
+    project: ./src
+    language: dotnet
+    host: appservice
+    docker:
+      path: ./src/Dockerfile
+      context: ./src
+
+hooks:
+  preprovision:
+    shell: sh
+    run: echo "Starting infrastructure provisioning..."
+    continueOnError: false
+    
+  postprovision:
+    shell: sh
+    run: |
+      echo "Infrastructure provisioned successfully"
+      echo "ACR Login Server: ${ACR_LOGIN_SERVER}"
+      echo "App Service URL: https://${APP_SERVICE_HOSTNAME}"
+    continueOnError: true
+
+  predeploy:
+    shell: sh
+    run: echo "Starting application deployment..."
+    continueOnError: false
+    
+  postdeploy:
+    shell: sh
+    run: |
+      echo "Application deployed successfully"
+      echo "Access your application at: https://${APP_SERVICE_HOSTNAME}"
+    continueOnError: true
