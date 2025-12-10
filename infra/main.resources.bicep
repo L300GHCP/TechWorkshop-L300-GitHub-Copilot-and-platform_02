@@ -90,7 +90,7 @@ module acrRoleAssignment 'modules/acr-role-assignment.bicep' = {
   name: 'acr-role-assignment-deployment'
   params: {
     principalId: appService.outputs.principalId
-    acrId: acr.outputs.id
+    acrName: acr.outputs.name
   }
 }
 

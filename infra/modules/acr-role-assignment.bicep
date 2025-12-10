@@ -1,8 +1,8 @@
 @description('The principal ID to assign the role to')
 param principalId string
 
-@description('The resource ID of the Azure Container Registry')
-param acrId string
+@description('The name of the Azure Container Registry')
+param acrName string
 
 @description('The principal type (ServicePrincipal, User, or Group)')
 @allowed([
@@ -12,12 +12,17 @@ param acrId string
 ])
 param principalType string = 'ServicePrincipal'
 
+// Reference the existing ACR
+resource acr 'Microsoft.ContainerRegistry/registries@2023-07-01' existing = {
+  name: acrName
+}
+
 // AcrPull role definition ID
 var acrPullRoleDefinitionId = subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '7f951dda-4ed3-4680-a7ca-43fe172d538d')
 
 resource acrRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(acrId, principalId, acrPullRoleDefinitionId)
-  scope: resourceGroup()
+  name: guid(acr.id, principalId, acrPullRoleDefinitionId)
+  scope: acr
   properties: {
     roleDefinitionId: acrPullRoleDefinitionId
     principalId: principalId

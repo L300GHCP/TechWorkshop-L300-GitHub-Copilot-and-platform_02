@@ -99,7 +99,7 @@ docker-compose.override.yml
 
 # Bicep compiled files (ARM templates)
 infra/**/*.json
-!infra/**/*.parameters*.json
+!infra/**/*parameters*.json
 
 # Logs
 *.log
