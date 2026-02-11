@@ -1,0 +1,50 @@
+name: Build and Deploy to Azure App Service
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  DOTNET_VERSION: '6.0.x'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Log in to Azure Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ vars.ACR_LOGIN_SERVER }}
+        username: ${{ secrets.ACR_USERNAME }}
+        password: ${{ secrets.ACR_PASSWORD }}
+
+    - name: Build and push Docker image
+      run: |
+        docker build -t ${{ vars.ACR_LOGIN_SERVER }}/zavastore:${{ github.sha }} -t ${{ vars.ACR_LOGIN_SERVER }}/zavastore:latest ./src
+        docker push ${{ vars.ACR_LOGIN_SERVER }}/zavastore:${{ github.sha }}
+        docker push ${{ vars.ACR_LOGIN_SERVER }}/zavastore:latest
+
+    - name: Azure Login
+      uses: azure/login@v2
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Deploy to Azure App Service
+      run: |
+        az webapp config container set \
+          --name ${{ vars.APP_SERVICE_NAME }} \
+          --resource-group ${{ vars.RESOURCE_GROUP_NAME }} \
+          --docker-custom-image-name ${{ vars.ACR_LOGIN_SERVER }}/zavastore:${{ github.sha }} \
+          --docker-registry-server-url https://${{ vars.ACR_LOGIN_SERVER }}
+
+    - name: Restart App Service
+      run: |
+        az webapp restart \
+          --name ${{ vars.APP_SERVICE_NAME }} \
+          --resource-group ${{ vars.RESOURCE_GROUP_NAME }}
